@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+pymongo
+python-multipart
+asyncpg 
+sqlalchemy
