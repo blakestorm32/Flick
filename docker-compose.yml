@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo_data:/data/db
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: videoplatform
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  fastapi:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+    container_name: fastapi
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb://root:example@mongo:27017/
+      - POSTGRES_URI=postgresql://postgres:password@postgres:5432/videoplatform
+    depends_on:
+      - mongo
+      - postgres
+
+volumes:
+  mongo_data:
+  postgres_data:
